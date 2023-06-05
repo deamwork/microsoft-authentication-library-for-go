@@ -494,6 +494,30 @@ func WithTenantID(tenantID string) interface {
 	}
 }
 
+// WithTokenType specifies a SAML asstern for a single authentication
+// This option is valid for only On-Behalf-Of flow token acquisition method.
+func WithTokenType(tokenType string) interface {
+	AcquireOnBehalfOfOption
+	options.CallOption
+} {
+	return struct {
+		AcquireOnBehalfOfOption
+		options.CallOption
+	}{
+		CallOption: options.NewCallOption(
+			func(a any) error {
+				switch t := a.(type) {
+				case *acquireTokenOnBehalfOfOptions:
+					t.tokenType = tokenType
+				default:
+					return fmt.Errorf("unexpected options type %T", a)
+				}
+				return nil
+			},
+		),
+	}
+}
+
 // acquireTokenSilentOptions are all the optional settings to an AcquireTokenSilent() call.
 // These are set by using various AcquireTokenSilentOption functions.
 type acquireTokenSilentOptions struct {
@@ -647,7 +671,7 @@ func (cca Client) AcquireTokenByCredential(ctx context.Context, scopes []string,
 
 // acquireTokenOnBehalfOfOptions contains optional configuration for AcquireTokenOnBehalfOf
 type acquireTokenOnBehalfOfOptions struct {
-	claims, tenantID string
+	claims, tenantID, tokenType string
 }
 
 // AcquireOnBehalfOfOption is implemented by options for AcquireTokenOnBehalfOf
@@ -658,7 +682,7 @@ type AcquireOnBehalfOfOption interface {
 // AcquireTokenOnBehalfOf acquires a security token for an app using middle tier apps access token.
 // Refer https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow.
 //
-// Options: [WithClaims], [WithTenantID]
+// Options: [WithClaims], [WithTenantID], [WithTokenType]
 func (cca Client) AcquireTokenOnBehalfOf(ctx context.Context, userAssertion string, scopes []string, opts ...AcquireOnBehalfOfOption) (AuthResult, error) {
 	o := acquireTokenOnBehalfOfOptions{}
 	if err := options.ApplyOptions(&o, opts); err != nil {
@@ -670,6 +694,7 @@ func (cca Client) AcquireTokenOnBehalfOf(ctx context.Context, userAssertion stri
 		Claims:        o.claims,
 		Credential:    cca.cred,
 		TenantID:      o.tenantID,
+		TokenType:     o.tokenType,
 	}
 	return cca.base.AcquireTokenOnBehalfOf(ctx, params)
 }

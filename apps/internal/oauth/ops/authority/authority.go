@@ -180,6 +180,8 @@ type AuthParams struct {
 	LoginHint string
 	// DomainHint is a directive that can be used to accelerate the user to their federated IdP sign-in page
 	DomainHint string
+	// TokenType defines the URN of the requested token type
+	TokenType string
 }
 
 // NewAuthParams creates an authorization parameters object.

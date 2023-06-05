@@ -299,6 +299,7 @@ func (c Client) FromUserAssertionClientSecret(ctx context.Context, authParameter
 	qv.Set("assertion", userAssertion)
 	qv.Set(clientInfo, clientInfoVal)
 	qv.Set("requested_token_use", "on_behalf_of")
+	qv.Set("requested_token_type", authParameters.TokenType)
 	addScopeQueryParam(qv, authParameters)
 
 	return c.doTokenResp(ctx, authParameters, qv)
@@ -316,6 +317,7 @@ func (c Client) FromUserAssertionClientCertificate(ctx context.Context, authPara
 	qv.Set("assertion", userAssertion)
 	qv.Set(clientInfo, clientInfoVal)
 	qv.Set("requested_token_use", "on_behalf_of")
+	qv.Set("requested_token_type", authParameters.TokenType)
 	addScopeQueryParam(qv, authParameters)
 
 	return c.doTokenResp(ctx, authParameters, qv)

@@ -77,6 +77,7 @@ type AcquireTokenOnBehalfOfParameters struct {
 	Credential    *accesstokens.Credential
 	TenantID      string
 	UserAssertion string
+	TokenType     string
 }
 
 // AuthResult contains the results of one token acquisition operation in PublicClientApplication
@@ -385,6 +386,7 @@ func (b Client) AcquireTokenOnBehalfOf(ctx context.Context, onBehalfOfParams Acq
 	authParams.Claims = onBehalfOfParams.Claims
 	authParams.Scopes = onBehalfOfParams.Scopes
 	authParams.UserAssertion = onBehalfOfParams.UserAssertion
+	authParams.TokenType = onBehalfOfParams.TokenType
 	token, err := b.Token.OnBehalfOf(ctx, authParams, onBehalfOfParams.Credential)
 	if err == nil {
 		ar, err = b.AuthResultFromToken(ctx, authParams, token, true)
